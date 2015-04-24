@@ -1,0 +1,30 @@
+<table id="logs">
+  <thead>
+    <tr>
+      <th> Log Body </th>
+      <th> Log Timestamp </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @logs.each do |log| %>
+      <tr>
+        <td>
+          <%= log.body %>
+        </td>
+        <td>
+          <%= log.timestamp.to_s(:iso8601) %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<script type="text/javascript">
+<% if @project.persisted? %>
+  var client = new Faye.Client("http://localhost:9292/faye")
+  client.subscribe("/projects/<%= @project.name %>", function(message) {
+    html = "<tr>" + "<td>" + message.body + "</td><td>" + message.timestamp + "</td></tr>";
+    document.querySelector('#logs tbody').innerHTML += html;
+  })
+<% end %>
+</script>
